@@ -1,10 +1,15 @@
+package lexer;
+
+import lexer.TokenType;
+import lexer.Token;
+
 public class Lexer {
   String input;
   int position;
   int readPosition;
   char ch;
 
-  Lexer(String input) {
+  public Lexer(String input) {
     this.input = input;
     this.readChar();
   }
@@ -20,7 +25,7 @@ public class Lexer {
     this.readPosition += 1;
   }
 
-  Token nextToken() {
+  public Token nextToken() {
     Token token = new Token(TokenType.ILLEGAL, '\0');
 
     this.skipWhitespace();

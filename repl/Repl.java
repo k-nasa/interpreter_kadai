@@ -1,3 +1,9 @@
+package repl;
+
+import lexer.Lexer;
+import lexer.Token;
+import lexer.TokenType;
+
 import java.util.Scanner;
 
 public class Repl {
@@ -16,7 +22,8 @@ public class Repl {
       Token token;
 
       for(token = l.nextToken(); token.type != TokenType.EOF; token = l.nextToken()) {
-        System.out.println(token);
+        System.out.print("type:    " + token.type);
+        System.out.println("literal: " + token.literal);
       }
     }
   }

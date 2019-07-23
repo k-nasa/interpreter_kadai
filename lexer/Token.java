@@ -1,6 +1,10 @@
+package lexer;
+
+import lexer.TokenType;
+
 public final class Token {
-  String type;
-  String literal;
+  public String type;
+  public String literal;
 
   Token(String type, char literal) {
     this.type = type;
@@ -27,8 +31,12 @@ public final class Token {
         return TokenType.ELSE;
       case "return":
         return TokenType.RETURN;
+      default:
+        return TokenType.IDENT;
     }
+  }
 
-    return null;
+  String type() {
+    return this.type;
   }
 }
