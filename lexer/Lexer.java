@@ -27,7 +27,16 @@ public class Lexer {
 
     switch(this.ch) {
       case '=':
-        token = new Token(TokenType.ASSIGN, this.ch);
+        if(this.peekChar() == '=') {
+          char ch = this.ch;
+
+          this.readChar();
+          String literal = String.valueOf(ch) + String.valueOf(this.ch);
+
+          token = new Token(TokenType.EQ, literal);
+        } else {
+          token = new Token(TokenType.ASSIGN, this.ch);
+        }
         break;
       case ';':
         token = new Token(TokenType.SEMICOLON, this.ch);
@@ -43,6 +52,33 @@ public class Lexer {
         break;
       case '+':
         token = new Token(TokenType.PLUS, this.ch);
+        break;
+      case '-':
+        token = new Token(TokenType.MINUS, this.ch);
+        break;
+      case '*':
+        token = new Token(TokenType.ASTERISK, this.ch);
+        break;
+      case '/':
+        token = new Token(TokenType.SLASH, this.ch);
+        break;
+      case '!':
+        if(this.peekChar() == '=') {
+          char ch = this.ch;
+
+          this.readChar();
+          String literal = String.valueOf(ch) + String.valueOf(this.ch);
+
+          token = new Token(TokenType.BANG, literal);
+        } else {
+        token = new Token(TokenType.BANG, this.ch);
+        }
+        break;
+      case '<':
+        token = new Token(TokenType.LT, this.ch);
+        break;
+      case '>':
+        token = new Token(TokenType.GT, this.ch);
         break;
       case '{':
         token = new Token(TokenType.LBRACE, this.ch);
@@ -99,6 +135,14 @@ public class Lexer {
     }
   }
 
+  char peekChar() {
+    if (this.readPosition >= this.input.length()){
+      return '\0';
+    }
+
+    return this.input.charAt(this.readPosition);
+  }
+
 
   boolean isLetter(char ch) {
     return
@@ -112,7 +156,6 @@ public class Lexer {
   }
 
   boolean isDigital(char ch) {
-    return '0' <= ch && ch <= '9'
+    return '0' <= ch && ch <= '9';
   }
-
 }
