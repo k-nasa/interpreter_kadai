@@ -18,13 +18,22 @@ public class Repl {
       String input = scanner.nextLine();
 
       Lexer l = new Lexer(input);
+      Parser p = new Parser(l);
 
-      Token token;
+      Program program = p.ParseProgram();
 
-      for(token = l.nextToken(); token.type != TokenType.EOF; token = l.nextToken()) {
-        System.out.print("type:    " + token.type);
-        System.out.println("literal: " + token.literal);
+      if(p.errors.size() != 0) {
+        printParserErrors(p.errors);
+        continue;
       }
+
+      System.out.println(program);
+    }
+  }
+
+  static void printParserErrors(ArrayList<String> errors) {
+    for(String s : errors){
+      System.out.println(s);
     }
   }
 }
