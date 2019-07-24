@@ -5,6 +5,14 @@ import ast.*;
 import java.util.ArrayList;
 
 public class Parser {
+  static int LOWESE = 1;
+  static int EQUALS = 2;
+  static int LESSGRATER = 3;
+  static int SUM = 4;
+  static int PRODUCT = 5;
+  static int PREFIX = 6;
+  static int CALL = 7;
+
   Lexer l;
 
   Token currentToken;
@@ -51,7 +59,7 @@ public class Parser {
       case TokenType.RETURN:
         return this.parseReturnStatement();
       default:
-          return null;
+          return this.parseExpressionStatment();
     }
   }
 
@@ -85,6 +93,44 @@ public class Parser {
       this.nextToken();
 
     return stmt;
+  }
+
+  ExpressionStatement parseExpressionStatment() {
+    ExpressionStatement stmt = new ExpressionStatement();
+
+    stmt.token = this.currentToken;
+    stmt.expression = this.parseExpression(LOWESE);
+
+    if(this.peekTokenIs(TokenType.SEMICOLON))
+      this.nextToken();
+
+    return stmt;
+  }
+
+  Expression parseExpression(int precedunce) {
+    Expression left = parsePrefix(this.currentToken.type);
+
+    return left;
+  }
+
+  Expression parsePrefix(String t) {
+    switch(t) {
+      case TokenType.IDENT:
+        return new Identifier(this.currentToken, this.currentToken.literal);
+      case TokenType.INT:
+        return parseIntegerLiteral();
+    }
+
+    return null;
+  }
+
+  Expression parseIntegerLiteral() {
+    IntegerLiteral literal = new IntegerLiteral();
+
+    literal.token = this.currentToken;
+    literal.value = Integer.valueOf(this.currentToken.literal);
+
+    return literal;
   }
 
   boolean currentTokenIs(String type) {
