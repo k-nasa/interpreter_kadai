@@ -1,10 +1,11 @@
 package repl;
 
-import lexer.Lexer;
-import lexer.Token;
-import lexer.TokenType;
+import lexer.*;
+import parser.*;
+import ast.*;
 
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Repl {
   static String PROMPT = ">>";
