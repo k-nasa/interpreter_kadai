@@ -12,4 +12,8 @@ public class Program implements Node {
 
     return "";
   }
+
+  public Program() {
+    this.statements = new ArrayList<Statement>();
+  }
 }
