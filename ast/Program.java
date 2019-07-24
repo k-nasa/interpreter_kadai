@@ -1,9 +1,13 @@
+package ast;
+
+import java.util.ArrayList;
+
 public class Program implements Node {
-  Statement[] statements;
+  public ArrayList<Statement> statements;
 
   public String tokenLiteral() {
-    if(this.statements.length > 0) {
-      return this.statements[0].tokenLiteral();
+    if(this.statements.size() > 0) {
+      return this.statements.get(0).tokenLiteral();
     }
 
     return "";
