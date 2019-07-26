@@ -68,9 +68,23 @@ public class Evaluator {
           return new object.IntegerObject(leftValue * rightValue);
         case "/":
           return new object.IntegerObject(leftValue / rightValue);
+        case "<":
+          return new object.Boolean(leftValue < rightValue);
+        case ">":
+          return new object.Boolean(leftValue > rightValue);
+        case "==":
+          return new object.Boolean(leftValue == rightValue);
+        case "!=":
+          return new object.Boolean(leftValue != rightValue);
       }
     }
 
+    switch(operator){
+      case "==":
+        return new object.Boolean(left == right);
+      case "!=":
+        return new object.Boolean(left!= right);
+    }
     return NULL;
 
   }

@@ -74,9 +74,9 @@ public class Lexer {
           this.readChar();
           String literal = String.valueOf(ch) + String.valueOf(this.ch);
 
-          token = new Token(TokenType.BANG, literal);
+          token = new Token(TokenType.NOT_EQ, literal);
         } else {
-        token = new Token(TokenType.BANG, this.ch);
+          token = new Token(TokenType.BANG, this.ch);
         }
         break;
       case '<':
