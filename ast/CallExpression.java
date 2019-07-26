@@ -3,10 +3,10 @@ package ast;
 import lexer.*;
 import java.util.ArrayList;
 
-public class FunctionLiteral implements Expression {
-  public Token token;
-  public ArrayList<Identifier> parameters;
-  public BlockStatement body;
+public class CallExpression implements Expression {
+  Token token;
+  Expression function;
+  ArrayList<Expression> arguments;
 
   public void expressionNode() {}
 

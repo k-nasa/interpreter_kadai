@@ -75,7 +75,11 @@ public class Parser {
     if(!this.expectPeek(TokenType.ASSIGN))
       return null;
 
-    while(!this.currentTokenIs(TokenType.SEMICOLON))
+    this.nextToken();
+
+    stmt.value = this.parseExpression(LOWEST);
+
+    if(this.peekTokenIs(TokenType.SEMICOLON))
       this.nextToken();
 
     return stmt;
@@ -127,11 +131,59 @@ public class Parser {
         return parseGroupedExpression();
       case TokenType.IF:
         return parseIfExpression();
+      case TokenType.FUNCTION:
+        return parseFunctionLiteral();
       default:
         this.noPrefixParseError(t);
     }
 
     return null;
+  }
+
+  Expression parseFunctionLiteral() {
+    FunctionLiteral literal = new FunctionLiteral();
+    literal.token = this.currentToken;
+
+    if(!this.expectPeek(TokenType.LPAREN)) {
+      return null;
+    }
+
+    literal.parameters = this.parseFunctionParameters();
+
+    if(!this.expectPeek(TokenType.LBRACE)) {
+      return null;
+    }
+
+    literal.body = this.parseBlockStatement();
+
+    return literal;
+  }
+
+  ArrayList<Identifier> parseFunctionParameters() {
+    ArrayList<Identifier> Identifiers = new ArrayList<Identifier>();
+
+    if(this.peekTokenIs(TokenType.RPAREN)) {
+      this.nextToken();
+      return Identifiers;
+    }
+
+    this.nextToken();
+
+    Identifier ident = new Identifier(this.currentToken, this.currentToken.literal);
+    Identifiers.add(ident);
+
+    while(this.peekTokenIs(TokenType.COMMA)) {
+      this.nextToken();
+      this.nextToken();
+
+      Identifier i = new Identifier(this.currentToken, this.currentToken.literal);
+      Identifiers.add(i);
+    }
+
+    if(!this.expectPeek(TokenType.RPAREN))
+      return null;
+
+    return Identifiers;
   }
 
   Expression parseIfExpression() {
@@ -242,7 +294,9 @@ public class Parser {
 
     this.nextToken();
 
-    while(!this.currentTokenIs(TokenType.SEMICOLON))
+    stmt.returnValue = this.parseExpression(LOWEST);
+
+    if(!this.currentTokenIs(TokenType.SEMICOLON))
       this.nextToken();
 
     return stmt;
@@ -311,6 +365,8 @@ public class Parser {
         return PRODUCT;
       case TokenType.ASTERISK:
         return PRODUCT;
+      case TokenType.LPAREN:
+        return CALL;
     }
     return NOT_FOUND;
   }
