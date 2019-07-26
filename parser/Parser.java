@@ -5,7 +5,7 @@ import ast.*;
 import java.util.*;
 
 public class Parser {
-  static int LOWESE = 1;
+  static int LOWEST = 1;
   static int EQUALS = 2;
   static int LESSGRATER = 3;
   static int SUM = 4;
@@ -85,12 +85,16 @@ public class Parser {
     ExpressionStatement stmt = new ExpressionStatement();
 
     stmt.token = this.currentToken;
-    stmt.expression = this.parseExpression(LOWESE);
+    stmt.expression = this.parseExpression(LOWEST);
 
     if(this.peekTokenIs(TokenType.SEMICOLON))
       this.nextToken();
 
     return stmt;
+  }
+
+  Expression parseBoolean() {
+    return new BooleanLiteral(this.currentToken, this.currentTokenIs(TokenType.TRUE));
   }
 
   Expression parseExpression(int precedunce) {
@@ -115,11 +119,85 @@ public class Parser {
         return parsePrefixExpression();
       case TokenType.MINUS:
         return parsePrefixExpression();
+      case TokenType.TRUE:
+        return parseBoolean();
+      case TokenType.FALSE:
+        return parseBoolean();
+      case TokenType.LPAREN:
+        return parseGroupedExpression();
+      case TokenType.IF:
+        return parseIfExpression();
       default:
         this.noPrefixParseError(t);
     }
 
     return null;
+  }
+
+  Expression parseIfExpression() {
+    IfExpression exp = new IfExpression();
+    exp.token = this.currentToken;
+
+    if(!this.expectPeek(TokenType.LPAREN)) {
+      return null;
+    }
+
+    this.nextToken();
+    exp.condition = this.parseExpression(LOWEST);
+
+    if(!this.expectPeek(TokenType.RPAREN)) {
+      return null;
+    }
+
+    if(!this.expectPeek(TokenType.LBRACE)) {
+      return null;
+    }
+
+    exp.consequence = this.parseBlockStatement();
+
+    if(this.peekTokenIs(TokenType.ELSE)) {
+      this.nextToken();
+
+      if(!expectPeek(TokenType.LBRACE)) {
+        return null;
+      }
+
+      exp.alternative = this.parseBlockStatement();
+    }
+
+    return exp;
+  }
+
+  BlockStatement parseBlockStatement() {
+    BlockStatement block = new BlockStatement();
+    block.token = this.currentToken;
+
+    block.statements = new ArrayList<Statement>();
+
+    this.nextToken();
+
+    while(!this.currentTokenIs(TokenType.RBRACE) && !currentTokenIs(TokenType.EOF)) {
+      Statement stmt = this.parseStatement();
+      if(stmt != null) {
+        block.statements.add(stmt);
+      }
+
+      this.nextToken();
+    }
+
+    return block;
+  }
+
+  Expression parseGroupedExpression() {
+    this.nextToken();
+
+    Expression exp = this.parseExpression(LOWEST);
+
+    if(!this.expectPeek(TokenType.RPAREN)) {
+      return null;
+    }
+
+    return exp;
   }
 
   Expression parseInfixExpression(Expression left) {
@@ -175,7 +253,7 @@ public class Parser {
       return getPrecedunces(this.currentToken.type);
     }
 
-    return LOWESE;
+    return LOWEST;
   }
 
   int peekPrecedence() {
@@ -183,7 +261,7 @@ public class Parser {
       return getPrecedunces(this.peekToken.type);
     }
 
-    return LOWESE;
+    return LOWEST;
   }
 
   void peekError(String type) {
