@@ -4,7 +4,7 @@ import ast.*;
 import lexer.*;
 import java.util.ArrayList;
 
-public class BlockStatement {
+public class BlockStatement implements Statement {
   public Token token;
   public ArrayList<Statement> statements;
 

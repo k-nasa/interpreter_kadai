@@ -14,10 +14,14 @@ public class Evaluator {
     // node interfaceを具体型にキャストする必要がある
     // 可読性は悪いがifでどのクラス化を判定してASTの評価をする
 
-    if (node instanceof Program) {
-      Program o = (Program) node;
-      return evalStatements(o.statements);
-    }
+    if (node instanceof Program)
+      return evalStatements(((Program) node).statements);
+
+    if (node instanceof BlockStatement)
+      return evalStatements(((BlockStatement) node).statements);
+
+    if (node instanceof IfExpression)
+      return evalIfExpression((IfExpression) node);
 
     if (node instanceof ExpressionStatement) {
       ExpressionStatement o = (ExpressionStatement) node;
@@ -49,6 +53,18 @@ public class Evaluator {
       object.Object left = Eval(o.left);
 
       return evalInfixExpression(o.operator, right, left);
+    }
+
+    return NULL;
+  }
+
+  static object.Object evalIfExpression(IfExpression ifExpression) {
+    object.Object condition = Eval(ifExpression.condition);
+
+    if (isTruthy(condition)) {
+      return Eval(ifExpression.consequence);
+    } else if(ifExpression != null) {
+      return Eval(ifExpression.alternative);
     }
 
     return NULL;
@@ -138,5 +154,26 @@ public class Evaluator {
     }
 
     return result;
+  }
+
+  static boolean isTruthy(object.Object obj) {
+    if(obj == NULL) {
+      return false;
+    }
+
+    if(obj.inspect() == TRUE.inspect()) {
+      return true;
+    }
+
+    if(obj.inspect() == FALSE.inspect()) {
+      return false;
+    }
+
+    return true;
+  }
+
+  static void debugObject(object.Object obj) {
+    System.out.println("debug inspect: " + obj.inspect());
+    System.out.println("debug type: " + obj.type());
   }
 }
