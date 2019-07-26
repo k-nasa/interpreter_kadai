@@ -4,7 +4,7 @@ public class Null implements Object {
   int value;
 
   public String inspect() {
-    return "null"
+    return "null";
   }
 
   public String type() {

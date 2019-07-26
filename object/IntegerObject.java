@@ -1,7 +1,7 @@
 package object;
 
 public class IntegerObject implements Object {
-  int value;
+  public int value;
 
   public IntegerObject(int value) {
     this.value = value;

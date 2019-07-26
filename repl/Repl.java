@@ -3,6 +3,8 @@ package repl;
 import lexer.*;
 import parser.*;
 import ast.*;
+import evaluator.*;
+import object.*;
 
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -28,7 +30,12 @@ public class Repl {
         continue;
       }
 
-      System.out.println(program);
+
+      object.Object evaluated = Evaluator.Eval(program);
+
+      if(evaluated != null) {
+        System.out.println(evaluated.inspect());
+      }
     }
   }
 
