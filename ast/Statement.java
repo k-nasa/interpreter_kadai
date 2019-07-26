@@ -1,6 +1,5 @@
 package ast;
 
-public interface Statement {
-  String tokenLiteral();
+public interface Statement extends Node {
   void statementNode();
 }
