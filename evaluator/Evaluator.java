@@ -43,7 +43,36 @@ public class Evaluator {
       return FALSE;
     }
 
+    if (node instanceof InfixExpression) {
+      InfixExpression o = (InfixExpression) node;
+      object.Object right = Eval(o.right);
+      object.Object left = Eval(o.left);
+
+      return evalInfixExpression(o.operator, right, left);
+    }
+
     return NULL;
+  }
+
+  static object.Object evalInfixExpression(String operator, object.Object right, object.Object left) {
+    if (right instanceof object.IntegerObject && left instanceof object.IntegerObject) {
+      int rightValue = ((object.IntegerObject) right).value;
+      int leftValue = ((object.IntegerObject) left).value;
+
+      switch(operator) {
+        case "+":
+          return new object.IntegerObject(leftValue + rightValue);
+        case "-":
+          return new object.IntegerObject(leftValue - rightValue);
+        case "*":
+          return new object.IntegerObject(leftValue * rightValue);
+        case "/":
+          return new object.IntegerObject(leftValue / rightValue);
+      }
+    }
+
+    return NULL;
+
   }
 
   static object.Object evalPrefixExpression(String operator, object.Object right) {
