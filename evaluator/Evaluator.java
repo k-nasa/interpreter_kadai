@@ -37,9 +37,25 @@ public class Evaluator {
       return new object.ReturnValue(value);
     }
 
+    if (node instanceof Identifier) {
+      Identifier o = (Identifier) node;
+      return evalIdentifier(o, env);
+    }
+
     if (node instanceof IntegerLiteral) {
       IntegerLiteral o = (IntegerLiteral) node;
       return new IntegerObject(o.value);
+    }
+
+    if (node instanceof LetStatement) {
+      LetStatement ls = (LetStatement) node;
+
+      object.Object value = Eval(ls.value, env);
+
+      if(isError(value))
+        return value;
+
+      env.set(ls.name.value, value);
     }
 
     if (node instanceof PrefixExpression) {
@@ -93,6 +109,16 @@ public class Evaluator {
     }
 
     return result;
+  }
+
+  static object.Object evalIdentifier(Identifier node, object.Enviroment env) {
+    object.Object val = env.get(node.value);
+
+    if(val == null) {
+      return new object.Error("identifier not found: " + node.value);
+    }
+
+    return val;
   }
 
   static object.Object evalBlockStatemenet(BlockStatement block, object.Enviroment env) {
