@@ -15,10 +15,10 @@ public class Evaluator {
     // 可読性は悪いがifでどのクラス化を判定してASTの評価をする
 
     if (node instanceof Program)
-      return evalStatements(((Program) node).statements);
+      return evalProgram(((Program) node));
 
     if (node instanceof BlockStatement)
-      return evalStatements(((BlockStatement) node).statements);
+      return evalBlockStatemenet(((BlockStatement) node));
 
     if (node instanceof IfExpression)
       return evalIfExpression((IfExpression) node);
@@ -63,6 +63,35 @@ public class Evaluator {
     }
 
     return NULL;
+  }
+
+  static object.Object evalProgram(Program program) {
+    object.Object result = null;
+
+    for(Statement stmt : program.statements) {
+      result = Eval(stmt);
+
+      if(result instanceof object.ReturnValue) {
+        object.ReturnValue returnValue = (object.ReturnValue) result;
+        return returnValue.value;
+      }
+    }
+
+    return result;
+  }
+
+  static object.Object evalBlockStatemenet(BlockStatement block) {
+    object.Object result = null;
+
+    for(Statement stmt : block.statements) {
+      result = Eval(stmt);
+
+      if(result.type() == "RETURN_VALUE") {
+        return result;
+      }
+    }
+
+    return result;
   }
 
   static object.Object evalIfExpression(IfExpression ifExpression) {
