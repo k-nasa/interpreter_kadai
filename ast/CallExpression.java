@@ -4,9 +4,9 @@ import lexer.*;
 import java.util.ArrayList;
 
 public class CallExpression implements Expression {
-  Token token;
-  Expression function;
-  ArrayList<Expression> arguments;
+  public Token token;
+  public Expression function;
+  public ArrayList<Expression> arguments;
 
   public void expressionNode() {}
 

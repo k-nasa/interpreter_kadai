@@ -42,6 +42,28 @@ public class Evaluator {
       return evalIdentifier(o, env);
     }
 
+    if (node instanceof CallExpression) {
+      CallExpression o = (CallExpression) node;
+      object.Object function = Eval(o.function, env);
+
+      if(isError(function))
+        return function;
+
+      ArrayList<object.Object> args = evalExpressions(o.arguments, env);
+
+      if(args.size() == 1 && isError(args.get(0)))
+        return args.get(0);
+    }
+
+    if (node instanceof FunctionLiteral) {
+      FunctionLiteral o = (FunctionLiteral) node;
+
+      ArrayList<Identifier> params = o.parameters;
+      BlockStatement body = o.body;
+
+      return new object.Function(params, env, body);
+    }
+
     if (node instanceof IntegerLiteral) {
       IntegerLiteral o = (IntegerLiteral) node;
       return new IntegerObject(o.value);
@@ -106,6 +128,23 @@ public class Evaluator {
       if(result instanceof object.Error) {
         return result;
       }
+    }
+
+    return result;
+  }
+
+  static ArrayList<object.Object> evalExpressions(ArrayList<Expression> exps, object.Enviroment env) {
+    ArrayList<object.Object> result = new ArrayList<object.Object>();
+
+    for(Expression e : exps) {
+      object.Object evaluated = Eval(e, env);
+
+      if(isError(evaluated)) {
+        result.add(evaluated);
+        return result;
+      }
+
+      result.add(evaluated);
     }
 
     return result;
