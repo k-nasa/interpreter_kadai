@@ -5,7 +5,6 @@ import object.*;
 import java.util.ArrayList;
 
 public class Evaluator {
-
   static object.Object NULL = new Null();
   static object.Object TRUE = new object.Boolean(true);
   static object.Object FALSE = new object.Boolean(false);
