@@ -14,6 +14,7 @@ public class Repl {
 
   public static void Start() {
     Scanner scanner = new Scanner(System.in);
+    object.Enviroment env = new object.Enviroment();
 
     while(true) {
       System.out.print(PROMPT);
@@ -31,7 +32,7 @@ public class Repl {
       }
 
 
-      object.Object evaluated = Evaluator.Eval(program);
+      object.Object evaluated = Evaluator.Eval(program, env);
 
       if(evaluated != null) {
         System.out.println(evaluated.inspect());

@@ -10,27 +10,27 @@ public class Evaluator {
   static object.Object TRUE = new object.Boolean(true);
   static object.Object FALSE = new object.Boolean(false);
 
-  public static object.Object Eval(Node node) {
+  public static object.Object Eval(Node node, object.Enviroment env) {
     // node interfaceを具体型にキャストする必要がある
     // 可読性は悪いがifでどのクラス化を判定してASTの評価をする
 
     if (node instanceof Program)
-      return evalProgram(((Program) node));
+      return evalProgram(((Program) node), env);
 
     if (node instanceof BlockStatement)
-      return evalBlockStatemenet(((BlockStatement) node));
+      return evalBlockStatemenet(((BlockStatement) node), env);
 
     if (node instanceof IfExpression)
-      return evalIfExpression((IfExpression) node);
+      return evalIfExpression((IfExpression) node, env);
 
     if (node instanceof ExpressionStatement) {
       ExpressionStatement o = (ExpressionStatement) node;
-      return Eval(o.expression);
+      return Eval(o.expression, env);
     }
 
     if (node instanceof ReturnStatement) {
       ReturnStatement o = (ReturnStatement) node;
-      object.Object value = Eval(o.returnValue);
+      object.Object value = Eval(o.returnValue, env);
       if(isError(value)) {
         return value;
       }
@@ -45,7 +45,7 @@ public class Evaluator {
 
     if (node instanceof PrefixExpression) {
       PrefixExpression o = (PrefixExpression) node;
-      object.Object right = Eval(o.right);
+      object.Object right = Eval(o.right, env);
       if(isError(right)) {
         return right;
       }
@@ -62,11 +62,11 @@ public class Evaluator {
 
     if (node instanceof InfixExpression) {
       InfixExpression o = (InfixExpression) node;
-      object.Object right = Eval(o.right);
+      object.Object right = Eval(o.right, env);
       if(isError(right)) {
         return right;
       }
-      object.Object left = Eval(o.left);
+      object.Object left = Eval(o.left, env);
       if(isError(left)) {
         return left;
       }
@@ -77,11 +77,11 @@ public class Evaluator {
     return NULL;
   }
 
-  static object.Object evalProgram(Program program) {
+  static object.Object evalProgram(Program program, object.Enviroment env) {
     object.Object result = null;
 
     for(Statement stmt : program.statements) {
-      result = Eval(stmt);
+      result = Eval(stmt, env);
 
       if(result instanceof object.ReturnValue) {
         object.ReturnValue returnValue = (object.ReturnValue) result;
@@ -96,11 +96,11 @@ public class Evaluator {
     return result;
   }
 
-  static object.Object evalBlockStatemenet(BlockStatement block) {
+  static object.Object evalBlockStatemenet(BlockStatement block, object.Enviroment env) {
     object.Object result = null;
 
     for(Statement stmt : block.statements) {
-      result = Eval(stmt);
+      result = Eval(stmt, env);
 
       String type = result.type();
       if(type == "RETURN_VALUE" || type == "ERROR") {
@@ -111,16 +111,16 @@ public class Evaluator {
     return result;
   }
 
-  static object.Object evalIfExpression(IfExpression ifExpression) {
-    object.Object condition = Eval(ifExpression.condition);
+  static object.Object evalIfExpression(IfExpression ifExpression, object.Enviroment env) {
+    object.Object condition = Eval(ifExpression.condition, env);
       if(isError(condition)) {
         return condition;
       }
 
     if (isTruthy(condition)) {
-      return Eval(ifExpression.consequence);
+      return Eval(ifExpression.consequence, env);
     } else if(ifExpression != null) {
-      return Eval(ifExpression.alternative);
+      return Eval(ifExpression.alternative, env);
     }
 
     return NULL;
@@ -205,12 +205,12 @@ public class Evaluator {
 
   }
 
-  static object.Object evalStatements(ArrayList<Statement> stmts) {
+  static object.Object evalStatements(ArrayList<Statement> stmts, object.Enviroment env) {
     // nullで適当に初期化する。 もっといいやり方がありそう
     object.Object result = null;
 
     for(Statement stmt : stmts) {
-      result = Eval(stmt);
+      result = Eval(stmt, env);
 
       if(result instanceof object.ReturnValue) {
         object.ReturnValue returnValue = (object.ReturnValue) result;
