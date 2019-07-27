@@ -31,6 +31,9 @@ public class Evaluator {
     if (node instanceof ReturnStatement) {
       ReturnStatement o = (ReturnStatement) node;
       object.Object value = Eval(o.returnValue);
+      if(isError(value)) {
+        return value;
+      }
 
       return new object.ReturnValue(value);
     }
@@ -43,6 +46,9 @@ public class Evaluator {
     if (node instanceof PrefixExpression) {
       PrefixExpression o = (PrefixExpression) node;
       object.Object right = Eval(o.right);
+      if(isError(right)) {
+        return right;
+      }
 
       return evalPrefixExpression(o.operator, right);
     }
@@ -57,7 +63,13 @@ public class Evaluator {
     if (node instanceof InfixExpression) {
       InfixExpression o = (InfixExpression) node;
       object.Object right = Eval(o.right);
+      if(isError(right)) {
+        return right;
+      }
       object.Object left = Eval(o.left);
+      if(isError(left)) {
+        return left;
+      }
 
       return evalInfixExpression(o.operator, right, left);
     }
@@ -75,6 +87,10 @@ public class Evaluator {
         object.ReturnValue returnValue = (object.ReturnValue) result;
         return returnValue.value;
       }
+
+      if(result instanceof object.Error) {
+        return result;
+      }
     }
 
     return result;
@@ -86,7 +102,8 @@ public class Evaluator {
     for(Statement stmt : block.statements) {
       result = Eval(stmt);
 
-      if(result.type() == "RETURN_VALUE") {
+      String type = result.type();
+      if(type == "RETURN_VALUE" || type == "ERROR") {
         return result;
       }
     }
@@ -96,6 +113,9 @@ public class Evaluator {
 
   static object.Object evalIfExpression(IfExpression ifExpression) {
     object.Object condition = Eval(ifExpression.condition);
+      if(isError(condition)) {
+        return condition;
+      }
 
     if (isTruthy(condition)) {
       return Eval(ifExpression.consequence);
@@ -137,8 +157,12 @@ public class Evaluator {
       case "!=":
         return new object.Boolean(left!= right);
     }
-    return NULL;
 
+    if(left.type() != right.type()) {
+      return new object.Error(String.format("type mismatch: %s %s %s", left.type(), operator, right.type()));
+    }
+
+    return new object.Error(String.format("unkown operator: %s %s %s", left.type(), operator, right.type()));
   }
 
   static object.Object evalPrefixExpression(String operator, object.Object right) {
@@ -148,7 +172,7 @@ public class Evaluator {
       case "-":
         return evalMinusPrefixOperatorExpression(right);
       default:
-        return NULL;
+        return new object.Error(String.format("unkown operator: %s%s", operator, right.type()));
     }
   }
 
@@ -172,7 +196,7 @@ public class Evaluator {
 
   static object.Object evalMinusPrefixOperatorExpression(object.Object right) {
     if(right.type() != "INTEGER")  {
-      return NULL;
+      return new object.Error(String.format("unkown operator: %s%s", "-", right.type()));
     }
 
     object.IntegerObject o = (object.IntegerObject) right;
@@ -216,5 +240,9 @@ public class Evaluator {
   static void debugObject(object.Object obj) {
     System.out.println("debug inspect: " + obj.inspect());
     System.out.println("debug type: " + obj.type());
+  }
+
+  static boolean isError(object.Object obj) {
+    return obj instanceof object.Error;
   }
 }
