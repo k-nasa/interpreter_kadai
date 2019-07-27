@@ -28,6 +28,13 @@ public class Evaluator {
       return Eval(o.expression);
     }
 
+    if (node instanceof ReturnStatement) {
+      ReturnStatement o = (ReturnStatement) node;
+      object.Object value = Eval(o.returnValue);
+
+      return new object.ReturnValue(value);
+    }
+
     if (node instanceof IntegerLiteral) {
       IntegerLiteral o = (IntegerLiteral) node;
       return new IntegerObject(o.value);
@@ -151,6 +158,11 @@ public class Evaluator {
 
     for(Statement stmt : stmts) {
       result = Eval(stmt);
+
+      if(result instanceof object.ReturnValue) {
+        object.ReturnValue returnValue = (object.ReturnValue) result;
+        return returnValue.value;
+      }
     }
 
     return result;
