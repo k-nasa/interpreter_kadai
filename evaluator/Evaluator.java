@@ -111,7 +111,31 @@ public class Evaluator {
       return evalInfixExpression(o.operator, right, left);
     }
 
+    if (node instanceof CallExpression) {
+      CallExpression o = (CallExpression) node;
+      object.Object function = Eval(o.function, env);
+
+      if(isError(function)){
+        return function;
+      }
+
+      ArrayList<object.Object> args = evalExpressions(o.arguments, env);
+      if(args.size() == 1 && isError(args.get(0))) {
+        return args.get(0);
+      }
+
+      return applyFunction(function, args);
+    }
+
     return NULL;
+  }
+
+  static object.Object applyFunction(object.Object fn, ArrayList<object.Object> args) {
+    object.Function function = (object.Function) fn;
+    object.Enviroment extendedEnv = extendFunctionEnv(function, args);
+    object.Object evaluated = Eval(function.body, extendedEnv);
+
+    return unwrapReturnValue(evaluated);
   }
 
   static object.Object evalProgram(Program program, object.Enviroment env) {
@@ -308,5 +332,24 @@ public class Evaluator {
 
   static boolean isError(object.Object obj) {
     return obj instanceof object.Error;
+  }
+
+  static object.Enviroment extendFunctionEnv(object.Function fn, ArrayList<object.Object> args) {
+    object.Enviroment env = object.Enviroment.newEnclosedEnviroment(fn.env);
+
+    for(int i =0; i < args.size(); i++) {
+      env.set(fn.parameters.get(i).value, args.get(i));
+    }
+
+    return env;
+  }
+
+  static object.Object unwrapReturnValue(object.Object obj) {
+    if(obj instanceof object.ReturnValue) {
+      object.ReturnValue o = (object.ReturnValue) obj;
+      return o;
+    }
+
+    return obj;
   }
 }

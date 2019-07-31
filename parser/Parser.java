@@ -107,6 +107,10 @@ public class Parser {
     while(!this.peekTokenIs(TokenType.SEMICOLON) && precedunce < this.peekPrecedence()) {
       this.nextToken();
 
+      if(currentTokenIs(TokenType.LPAREN)) {
+        return parseCallExpression(left);
+      }
+
       left = parseInfixExpression(left);
     }
 
@@ -300,6 +304,38 @@ public class Parser {
       this.nextToken();
 
     return stmt;
+  }
+
+  Expression parseCallExpression(Expression function) {
+    CallExpression exp = new CallExpression(this.currentToken, function);
+    exp.arguments = parseCallArguments();
+
+    return exp;
+  }
+
+  ArrayList<Expression> parseCallArguments() {
+    ArrayList<Expression> args = new ArrayList<Expression>();
+
+    if(peekTokenIs(TokenType.RPAREN)) {
+      nextToken();
+      return args;
+    }
+
+    nextToken();
+    args.add(parseExpression(LOWEST));
+
+    while(peekTokenIs(TokenType.COMMA)) {
+      nextToken();
+      nextToken();
+
+      args.add(parseExpression(LOWEST));
+    }
+
+    if(!expectPeek(TokenType.RPAREN)) {
+      return null;
+    }
+
+    return args;
   }
 
   int currentPrecedence() {

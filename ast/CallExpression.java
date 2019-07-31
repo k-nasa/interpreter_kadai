@@ -13,4 +13,9 @@ public class CallExpression implements Expression {
   public String tokenLiteral() {
     return this.token.literal;
   }
+
+  public CallExpression(Token token, Expression function) {
+    this.token = token;
+    this.function = function;
+  }
 }
